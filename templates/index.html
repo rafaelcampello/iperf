@@ -1,13 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iPerf Results Plotter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        input[type="file"] {
+            margin-bottom: 20px;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <h1>iPerf Results</h1>
-    <form method="POST" action="/submit" enctype="multipart/form-data">
-        <input type="file" name="iperf_results_file" accept=".txt">
-        <input type="submit" value="Send">
-    </form>
+    <div class="container">
+        <h1>iPerf Test Results</h1>
+        <p>Please upload your iPerf test results file (.txt format).</p>
+        <form method="POST" action="/submit" enctype="multipart/form-data">
+            <input type="file" name="iperf_results_file" accept=".txt">
+            <br>
+            <input type="submit" value="Upload">
+        </form>
+    </div>
 </body>
 </html>
