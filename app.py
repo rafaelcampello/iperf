@@ -17,48 +17,52 @@ def submit_results():
     
     iperf_results = file.read().decode('utf-8')
 
-    # Verificar se contém timestamps
     contains_timestamps = bool(re.search(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', iperf_results))
-    
     data = []
-    regex_pattern = r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}).*?(\d+\.\d+)-(\d+\.\d+) sec.*?(\d+)/(\d+)\s+\((\d+\.\d+)%\)' if contains_timestamps else r'\[.*?\]\s+(\d+\.\d+)-(\d+\.\d+) sec.*?(\d+)/(\d+)\s+\((\d+\.\d+)%\)'
-    
     total_loss = "N/A"
+    
+    if contains_timestamps:
+        regex_pattern = r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}).*?(\d+\.\d+)-(\d+\.\d+) sec.*\((\d+)%\)'
+    else:
+        regex_pattern = r'\[.*?\]\s+(\d+\.\d+)-(\d+\.\d+) sec.*\((\d+)%\)'
+    
     for match in re.finditer(regex_pattern, iperf_results):
         if contains_timestamps:
-            timestamp_str, time_start, time_end, _, _, loss_percentage = match.groups()
+            timestamp_str, _, _, loss_percentage = match.groups()
             timestamp = datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M:%S')
             time = timestamp
         else:
-            time_start, time_end, _, _, loss_percentage = match.groups()
+            time_start, time_end, loss_percentage = match.groups()
             time = (float(time_start) + float(time_end)) / 2
         data.append((time, float(loss_percentage)))
-
-    # Extract the total packet loss percentage from the last matching group
+    
     if data:
-        total_loss = match.group(6) + "%"  # Assuming the last match has the total loss
+        times, loss_percentages = zip(*data)
+        # Find total loss percentage
+        total_loss_match = re.search(r'\((\d+\.\d+)%\)', iperf_results.splitlines()[-1])
+        if total_loss_match:
+            total_loss = total_loss_match.group(1) + "%"
+        
+        # Create a Plotly graph
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=times, y=loss_percentages, mode='markers+lines', name='Loss %'))
+        fig.update_layout(
+            title='iPerf Test Results: Packet Loss Over Time',
+            xaxis=dict(
+                title='Time' + (' (Timestamps)' if contains_timestamps else ' (Seconds)'),
+                type='date' if contains_timestamps else 'linear'
+            ),
+            yaxis=dict(
+                title='Packet Loss Percentage (%)',
+            ),
+            hovermode='closest'
+        )
 
-    times, loss_percentages = zip(*data) if data else ([], [])
-
-    # Skipping the Plotly figure creation and base64 conversion for brevity
-
-    return render_template('results.html', graph_url="PLOTLY_GRAPH_URL", total_loss=total_loss
-    # Create a Plotly graph
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=times, y=loss_percentages, mode='lines+markers', name='Loss %'))
-    fig.update_layout(
-        title='iPerf Test Results: Packet Loss Over Time',
-        xaxis=dict(
-            title='Time' + (' (Timestamps)' if contains_timestamps else ' (Seconds)'),
-            type='date' if contains_timestamps else 'linear'
-        ),
-        yaxis=dict(
-            title='Packet Loss (%)',
-        ),
-        hovermode='closest'
-    )
-
-    # Serialize the figure to JSON for embedding in the HTML
-    graph_json = fig.to_json()
+        graph_json = fig.to_json()
+    else:
+        graph_json = None
 
     return render_template('results.html', graph_json=graph_json, total_loss=total_loss)
+
+if __name__ == '__main__':
+    app.run(debug=True)
