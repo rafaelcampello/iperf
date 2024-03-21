@@ -42,17 +42,28 @@
             border-radius: 5px;
             margin: 20px 0;
         }
+
+        .no-data {
+            color: #999;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>iPerf Test Results</h1>
-        <div>
-            <img src="data:image/png;base64,{{ graph_url }}" alt="iPerf Test Results Graph">
-        </div>
-        <div class="summary">
-            <p>The total packet loss was: {{ total_loss }}%</p>
-        </div>
+        {% if graph_url %}
+            <div>
+                <img src="data:image/png;base64,{{ graph_url }}" alt="iPerf Test Results Graph">
+            </div>
+            <div class="summary">
+                <p>The total packet loss was: {{ total_loss }}%</p>
+            </div>
+        {% else %}
+            <div class="no-data">
+                <p>No data available to display. Please ensure the uploaded file is in the correct format.</p>
+            </div>
+        {% endif %}
     </div>
 </body>
 </html>
