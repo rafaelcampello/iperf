@@ -4,66 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iPerf Test Results</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 80%;
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        .summary {
-            background-color: #007bff;
-            color: #ffffff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            margin: 20px 0;
-        }
-
-        .no-data {
-            color: #999;
-            margin-top: 20px;
-        }
-    </style>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- Outros estilos permanecem inalterados -->
 </head>
 <body>
-    <div class="container">
-        <h1>iPerf Test Results</h1>
-        {% if graph_url %}
-            <div>
-                <img src="data:image/png;base64,{{ graph_url }}" alt="iPerf Test Results Graph">
-            </div>
-            <div class="summary">
-                <p>The total packet loss was: {{ total_loss }}%</p>
-            </div>
-        {% else %}
-            <div class="no-data">
-                <p>No data available to display. Please ensure the uploaded file is in the correct format.</p>
-            </div>
-        {% endif %}
-    </div>
+<div class="container">
+    <h1>iPerf Test Results</h1>
+    {% if graph_json %}
+        <div id="graph"></div>
+        <script>
+            var figures = {{ graph_json|safe }};
+            Plotly.react('graph', figures.data, figures.layout);
+        </script>
+        <div class="summary">
+            <p>The total packet loss was: {{ total_loss }}</p>
+        </div>
+    {% else %}
+        <div class="no-data">
+            <p>No data available to display. Please ensure the uploaded file is in the correct format.</p>
+        </div>
+    {% endif %}
+</div>
 </body>
 </html>
