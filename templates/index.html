@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iPerf Results Plotter</title>
     <style>
-        /* Estilos anteriores mantidos para referência */
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
@@ -13,8 +12,8 @@
             padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
+            align-items: flex-start; /* Align items to the start to avoid trimming */
+            min-height: 100vh; /* Ensure body occupies at least the full height of the window */
         }
 
         .container {
@@ -23,6 +22,9 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             text-align: center;
+            max-width: 800px;
+            width: 100%; /* Adjust to take full width up to max 800px */
+            margin: 20px 0; /* Add margin for spacing */
         }
 
         h1 {
@@ -68,10 +70,30 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
+            margin-top: 10px; /* Add top margin for spacing */
         }
 
         input[type="submit"]:hover {
             background-color: #0056b3;
+        }
+
+        .guide {
+            margin-top: 20px;
+            text-align: left;
+            font-size: 14px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .example-image {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .example-image img {
+            max-width: 100%;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -88,6 +110,33 @@
             <br>
             <input type="submit" value="Upload">
         </form>
+
+        <div class="guide">
+            <h2>How to Use the App</h2>
+            <p>1. Run the iPerf test and save the results in a .txt file.</p>
+            <p>2. Ensure the file is in the correct format, similar to the example below:</p>
+            <pre>
+------------------------------------------------------------
+Server listening on UDP port 5001
+Receiving 1470 byte datagrams
+UDP buffer size:  122 KByte (default)
+------------------------------------------------------------
+[  3] local 162.249.176.54 port 5001 connected with 148.253.29.180 port 49858
+[ ID] Interval       Transfer     Bandwidth        Jitter   Lost/Total Datagrams
+[  3]  0.0- 1.0 sec  4.25 MBytes  35.7 Mbits/sec   0.465 ms    0/ 3032 (0%)
+[  3]  1.0- 2.0 sec  4.25 MBytes  35.6 Mbits/sec   0.470 ms    0/ 3031 (0%)
+[  3]  2.0- 3.0 sec  4.25 MBytes  35.7 Mbits/sec   0.464 ms    0/ 3032 (0%)
+...
+[  3]  0.0-7200.0 sec  29.8 GBytes  35.6 Mbits/sec   0.487 ms 45941/21827501 (0.21%)
+            </pre>
+            <p>3. Click "Choose File" to select the iPerf results file.</p>
+            <p>4. Click "Upload" to generate the packet loss graph.</p>
+        </div>
+
+        <div class="example-image">
+            <h2>Example Graph</h2>
+            <img src="static/example_plot.png" alt="Example Plot">
+        </div>
     </div>
     <script>
         document.getElementById('file-upload').addEventListener('change', function() {
