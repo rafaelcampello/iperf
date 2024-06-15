@@ -39,14 +39,10 @@ def submit_results():
     if data:
         times, loss_percentages = zip(*data)
         # Find total loss percentage
-        # Extrair a perda total de pacotes do último resultado que contém a perda total
         total_loss_match = re.search(r'\((\d+\.\d+)%\)', iperf_results.splitlines()[-1])
         if total_loss_match:
             total_loss = total_loss_match.group(1) + "%"
         else:
-            # Se não encontrar uma correspondência, isso significa que a perda pode ser 0%
-            # ou o arquivo pode não seguir o formato esperado.
-            # Assumiremos 0% para manter o comportamento consistente.
             total_loss = "0%"
         
         # Create a Plotly graph
@@ -61,7 +57,9 @@ def submit_results():
             yaxis=dict(
                 title='Packet Loss Percentage (%)',
             ),
-            hovermode='closest'
+            hovermode='closest',
+            width=1200,  # Adjust this value to make the graph wider
+            height=600   # You can adjust the height as well if needed
         )
 
         graph_json = fig.to_json()
