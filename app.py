@@ -2,9 +2,23 @@ from flask import Flask, render_template, request, redirect, url_for
 import re
 import plotly.graph_objects as go
 from datetime import datetime
+import webbrowser
+from threading import Timer
+import sys
+import os
 
 app = Flask(__name__)
 
+# Adjust the template and static folder paths for PyInstaller
+if getattr(sys, 'frozen', False):  # Check if running as a compiled app
+    app.template_folder = os.path.join(sys._MEIPASS, 'templates')
+    app.static_folder = os.path.join(sys._MEIPASS, 'static')
+
+# Function to open the browser automatically after the server starts
+def open_browser():
+    webbrowser.open_new("http://127.0.0.1:5000/")
+
+# Route to render the main form page        
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -38,12 +52,18 @@ def submit_results():
     
     if data:
         times, loss_percentages = zip(*data)
-        # Find total loss percentage
-        total_loss_match = re.search(r'\((\d+\.\d+)%\)', iperf_results.splitlines()[-1])
-        if total_loss_match:
-            total_loss = total_loss_match.group(1) + "%"
-        else:
-            total_loss = "0%"
+
+        # Find total packets sent and received from the last line of results
+        last_line = iperf_results.splitlines()[-1]
+        total_sent_match = re.search(r'(\d+)/(\d+)', last_line)
+        if total_sent_match:
+            total_received = int(total_sent_match.group(1))
+            total_sent = int(total_sent_match.group(2))
+            if total_sent > 0:
+                total_loss_percentage = (1 - (total_received / total_sent)) * 100
+                total_loss = f"{total_loss_percentage:.10f}%"
+            else:
+                total_loss = "0.0000000000%"
         
         # Create a Plotly graph
         fig = go.Figure()
@@ -69,4 +89,7 @@ def submit_results():
     return render_template('results.html', graph_json=graph_json, total_loss=total_loss)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Timer to automatically open the browser after 1 second
+    Timer(1, open_browser).start()
+    # Set Flask to run without reloader to avoid double execution
+    app.run(port=5000, debug=True, use_reloader=False)
