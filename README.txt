@@ -22,8 +22,8 @@ This is a Flask-based web application for visualizing packet loss data from iPer
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/iperf-plotting-app.git
-cd iperf-plotting-app
+git clone https://github.com/rafaelcampello/iperf
+cd iperf
 ```
 
 ### 2. Create and Activate a Virtual Environment
