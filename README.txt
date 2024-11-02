@@ -96,7 +96,7 @@ The app automatically detects the format and processes the data accordingly.
 
 - **app.py**: The main application file with all routes and logic.
 - **templates/**: Contains HTML templates (`index.html` and `results.html`).
-- **static/**: Folder for static assets like CSS, JavaScript, and icons.
+- **static/**: Folder for static assets like images and icons.
 
 ## Example iPerf File Format
 
